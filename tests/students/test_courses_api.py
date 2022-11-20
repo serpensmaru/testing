@@ -16,7 +16,7 @@ def client():
 @pytest.mark.django_db
 def test_get_lsit_course(client, create_courses):
     count = 10
-    courses = create_courses(_quantity=count)
+    create_courses(_quantity=count)
     response = client.get("/api/v1/courses/")
     assert response.status_code == 200
     data = response.json()
@@ -25,7 +25,7 @@ def test_get_lsit_course(client, create_courses):
 @pytest.mark.django_db
 def test_get_one_course(client, create_courses):
     count = 1
-    courses = create_courses(_quantity=count)
+    create_courses(_quantity=count)
     response = client.get("/api/v1/courses/")
     assert response.status_code == 200
     data = response.json()
@@ -47,12 +47,12 @@ def test_create_one_course(client):
 @pytest.mark.django_db
 def test_get_one_course_on_id(client, create_courses):
     count = 10
-    courses = create_courses(_quantity=count)
+    create_courses(_quantity=count)
     name_course = "TEST"
-    course = Course(name=name_course).save()
+    Course(name=name_course).save()
     course_id = Course.objects.filter(name=name_course).first().id
-    URL = "/api/v1/courses/?id={id}".format(id=course_id)
-    response = client.get(URL)
+    URL = "/api/v1/courses/"
+    response = client.get(URL, data={"id": course_id})
     assert response.status_code == 200
     data = response.json()
     assert len(data) == 1
@@ -61,24 +61,24 @@ def test_get_one_course_on_id(client, create_courses):
 @pytest.mark.django_db
 def test_get_one_course_on_name(client, create_courses):
     count = 10
-    courses = create_courses(_quantity=count)
+    create_courses(_quantity=count)
     name_course = "TEST"
-    course = Course(name=name_course).save()
-    URL = "/api/v1/courses/?name={name}".format(name=name_course)
+    Course(name=name_course).save()
+    id = Course.objects.filter(name=name_course).first().id
+    URL = "/api/v1/courses/{id}/".format(id=id)
     response = client.get(URL)
     assert response.status_code == 200
     data = response.json()
-    assert len(data) == 1
-    assert data[0]['name'] == name_course
+    assert data['id'] == id
 
 @pytest.mark.django_db
 def test_delete_course(client, create_courses):
     count = 10
-    courses = create_courses(_quantity=count)
+    create_courses(_quantity=count)
     name_course = "TEST"
-    course = Course(name=name_course).save()
+    Course(name=name_course).save()
     course_id = Course.objects.filter(name=name_course).first().id
-    URL = "/api/v1/courses/{}/".format(course_id)
+    URL = "/api/v1/courses/{id}/".format(id=course_id)
     response = client.delete(URL)
     assert response.status_code == 204
 
@@ -86,11 +86,11 @@ def test_delete_course(client, create_courses):
 @pytest.mark.django_db
 def test_update_course(client, create_courses):
     count = 10
-    courses = create_courses(_quantity=count)
+    create_courses(_quantity=count)
     name_course = "TEST"
-    course = Course(name=name_course).save()
+    Course(name=name_course).save()
     course_id = Course.objects.filter(name=name_course).first().id
-    URL = "/api/v1/courses/{}/".format(course_id)
+    URL = "/api/v1/courses/{id}/".format(id=course_id)
     data_params = {
         "name": "TEST_UPDATE"
     }
